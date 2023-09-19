@@ -69,4 +69,8 @@ contract MyNFT is ERC1155, AccessControl {
     function supportsInterface(bytes4 interfaceId) public view override(ERC1155, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
+    
+    function isAllowedToMint(uint256 id, address account) public view returns (bool) {
+        return _allowlists[id][account];
+    }
 }
