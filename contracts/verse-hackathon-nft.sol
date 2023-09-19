@@ -9,6 +9,7 @@ contract MyNFT is ERC1155, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     mapping(uint256 => mapping(address => bool)) private _allowlists;
+    mapping(uint256 => mapping(address => bool)) private _minted; // New mapping to keep track of who has minted
     mapping(uint256 => uint256) private _totalSupply;
     mapping(uint256 => string) private _tokenURIs;
 
@@ -21,7 +22,7 @@ contract MyNFT is ERC1155, AccessControl {
 
     constructor() ERC1155("https://versehackers.xyz/tokens/") {
         _setupRole(MINTER_ROLE, _msgSender());
-        token = ERC20(0xc708d6f2153933daa50b2d0758955be0a93a8fec); // Initial token address
+        token = ERC20(0xc708D6F2153933DAA50B2D0758955Be0A93A8FEc); // Initial token address
     }
 
     function setURI(uint256 id, string memory newURI) public {
@@ -46,13 +47,14 @@ contract MyNFT is ERC1155, AccessControl {
     }
 
     function mint(address account, uint256 id, bytes memory data) public {
-        uint256 amount = 1000; // It costs 1000 ERC20 tokens to mint an NFT
+        uint256 amount = 1000;
         require(hasRole(MINTER_ROLE, _msgSender()), "Must have minter role to mint");
         require(_allowlists[id][account], "Account is not on the allowlist for this token");
-        require(balanceOf(account, id) == 0, "Account has already minted this token");
+        require(_minted[id][account] == false, "Account has already minted this token"); // Check if the account has already minted the token
         require(token.transferFrom(account, address(this), amount), "Must transfer required amount of tokens to mint");
-        _mint(account, id, 1, data); // Only mint 1 NFT
-        _totalSupply[id] += 1; // Increase the total supply of this NFT by 1
+        _mint(account, id, 1, data);
+        _totalSupply[id] += 1;
+        _minted[id][account] = true; // Record that this account has minted the token
     }
 
     function totalSupply(uint256 id) public view returns (uint256) {
@@ -62,5 +64,9 @@ contract MyNFT is ERC1155, AccessControl {
     function setTokenAddress(address newAddress) public {
         require(hasRole(MINTER_ROLE, _msgSender()), "Must have minter role to set token address");
         token = ERC20(newAddress);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC1155, AccessControl) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 }
