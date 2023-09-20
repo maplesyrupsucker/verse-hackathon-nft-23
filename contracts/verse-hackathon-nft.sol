@@ -36,8 +36,11 @@ contract MyNFT is ERC1155, AccessControl {
 
     function addToAllowlistBulk(uint256 id, address[] memory accounts) public {
         require(hasRole(MINTER_ROLE, _msgSender()), "Must have minter role to add to allowlist");
-        for (uint i = 0; i < accounts.length; i++) {
+        for (uint i = 0; i < accounts.length;) {
             _allowlists[id][accounts[i]] = true;
+            unchecked {
+                ++i;
+            }
         }
     }
 
