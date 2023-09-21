@@ -20,6 +20,9 @@ small {text-align:center; display:block;font-weight:normal;letter-spacing:1px; c
     display: grid;
     grid-template-columns: repeat(4, 1fr);
   }
+  iframe {
+    min-height:725px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -28,3 +31,4 @@ small {text-align:center; display:block;font-weight:normal;letter-spacing:1px; c
     grid-template-columns: repeat(1, 1fr);
   }
 }
+.stars { position: absolute;z-index:-1; background-color: #fff; border-radius: 50%; animation: flicker 1s infinite alternate; } @keyframes flicker { from { opacity: 1; } to { opacity: 0.5; } }
